@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Alma Sport — Performance Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#455560;
+    --ink-soft:#7c8a93;
+    --gold:#FDBE57;
+    --gold-deep:#E8951F;
+    --cream:#F6F1E7;
+    --white:#FFFFFF;
+    --line:#E4DCC9;
+    --radius:20px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Barlow',sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    overscroll-behavior:none;
+  }
+  .app{
+    max-width:480px;
+    margin:0 auto;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+  .screen{
+    display:none;
+    flex:1;
+    flex-direction:column;
+    padding:32px 24px 28px;
+    animation:rise .45s ease both;
+  }
+  .screen.active{display:flex;}
+  @keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ---- shared ---- */
+  .logo{width:64px;height:auto;display:block;margin-bottom:28px;}
+  .peaks{width:100%;height:14px;display:block;margin:6px 0 22px;}
+  .eyebrow{font-size:13px;letter-spacing:.02em;color:var(--gold-deep);font-weight:700;margin-bottom:6px;}
+  h1{font-size:30px;line-height:1.15;font-weight:800;margin:0 0 14px;letter-spacing:-.01em;}
+  h2{font-size:22px;line-height:1.2;font-weight:800;margin:0 0 10px;}
+  p.lead{font-size:16px;line-height:1.5;color:var(--ink-soft);margin:0 0 28px;}
+  .spacer{flex:1;}
+  .btn{
+    appearance:none;border:none;cursor:pointer;
+    font-family:inherit;font-weight:700;font-size:17px;
+    padding:17px 22px;border-radius:14px;
+    width:100%;text-align:center;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:active{transform:scale(.98);}
+  .btn-primary{background:var(--ink);color:var(--white);box-shadow:0 10px 24px -10px rgba(69,85,96,.55);}
+  .btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line);}
+  .btn:disabled{opacity:.35;pointer-events:none;}
+  .btn-row{display:flex;gap:12px;}
+
+  /* ---- landing ---- */
+  #screen-landing .top{display:flex;align-items:center;justify-content:space-between;}
+  .badge{font-size:12px;font-weight:700;color:var(--ink-soft);background:var(--white);border:1px solid var(--line);padding:6px 12px;border-radius:100px;}
+  .hero-visual{display:flex;justify-content:center;margin:4px 0 18px;}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+  .chip{font-size:13px;font-weight:600;color:var(--ink);background:var(--white);border:1px solid var(--line);padding:7px 13px;border-radius:100px;}
+  .time-note{font-size:13px;color:var(--ink-soft);text-align:center;margin-top:14px;}
+  .peaks-cta{width:100%;height:12px;display:block;margin-bottom:10px;}
+
+  /* ---- quiz ---- */
+  .progress-track{height:5px;background:var(--line);border-radius:100px;overflow:hidden;margin-bottom:8px;}
+  .progress-fill{height:100%;background:var(--gold);border-radius:100px;transition:width .35s ease;}
+  .progress-meta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:26px;}
+  .area-tag{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--gold-deep);background:rgba(253,190,87,.16);padding:5px 11px;border-radius:100px;margin-bottom:16px;align-self:flex-start;}
+  .question-text{font-size:23px;line-height:1.28;font-weight:700;margin:0 0 30px;}
+  .scale{display:flex;gap:8px;margin-bottom:10px;}
+  .opt{
+    flex:1;aspect-ratio:1/1;border-radius:16px;border:1.5px solid var(--line);
+    background:var(--white);display:flex;align-items:center;justify-content:center;
+    font-size:22px;cursor:pointer;transition:all .15s ease;font-weight:700;color:var(--ink-soft);
+  }
+  .opt.selected{background:var(--ink);border-color:var(--ink);color:var(--white);transform:scale(1.04);}
+  .scale-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);font-weight:600;margin-bottom:auto;}
+  .back-link{background:none;border:none;color:var(--ink-soft);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;padding:0;margin-bottom:18px;align-self:flex-start;}
+
+  /* ---- target ---- */
+  .target-row{margin-bottom:24px;}
+  .target-row .row-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+  .target-row .row-head b{font-size:15.5px;font-weight:700;}
+  .target-row .row-head span{font-size:13px;color:var(--gold-deep);font-weight:700;}
+  input[type=range]{
+    -webkit-appearance:none;width:100%;height:6px;border-radius:100px;
+    background:var(--line);outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:24px;height:24px;border-radius:50%;
+    background:var(--gold);border:3px solid var(--white);box-shadow:0 2px 8px rgba(0,0,0,.25);cursor:pointer;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:24px;height:24px;border-radius:50%;background:var(--gold);border:3px solid var(--white);cursor:pointer;
+  }
+
+  /* ---- results ---- */
+  .radar-wrap{display:flex;justify-content:center;margin:6px 0 18px;}
+  .legend{display:flex;gap:18px;justify-content:center;margin-bottom:24px;}
+  .legend-item{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--ink-soft);}
+  .legend-dot{width:11px;height:11px;border-radius:3px;}
+  .insight-card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:18px 18px;margin-bottom:14px;}
+  .insight-card .k{font-size:12.5px;font-weight:700;color:var(--gold-deep);text-transform:uppercase;letter-spacing:.03em;margin-bottom:6px;}
+  .insight-card p{margin:0;font-size:15px;line-height:1.5;}
+  .gap-list{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;}
+  .gap-item{display:flex;align-items:center;gap:10px;background:var(--white);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:14px;font-weight:600;}
+  .gap-item .bar-bg{flex:1;height:6px;background:var(--line);border-radius:100px;overflow:hidden;}
+  .gap-item .bar-fill{height:100%;background:var(--gold-deep);border-radius:100px;}
+  .gap-item .val{width:34px;text-align:right;color:var(--ink-soft);font-size:12.5px;}
+
+  /* ---- lead form ---- */
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:var(--ink);}
+  .field input{
+    width:100%;padding:14px 15px;border-radius:12px;border:1.5px solid var(--line);
+    font-family:inherit;font-size:15.5px;background:var(--white);color:var(--ink);
+  }
+  .field input:focus{outline:none;border-color:var(--gold-deep);}
+  .consent{display:flex;gap:10px;align-items:flex-start;margin:6px 0 24px;}
+  .consent input{margin-top:3px;flex:none;width:17px;height:17px;accent-color:var(--ink);}
+  .consent label{font-size:12.5px;color:var(--ink-soft);line-height:1.5;}
+  .error-msg{color:#C24C3A;font-size:13px;font-weight:600;margin:-6px 0 14px;display:none;}
+
+  /* ---- thanks ---- */
+  .check-mark{width:56px;height:56px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;margin-bottom:22px;}
+  .cta-stack{display:flex;flex-direction:column;gap:12px;}
+
+  .footer-note{font-size:11.5px;color:var(--ink-soft);text-align:center;margin-top:18px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ LANDING ============ -->
+  <div class="screen active" id="screen-landing">
+    <div class="top">
+      <img src="alma-logo.png" alt="Alma Sport" class="logo">
+      <span class="badge">In fiera oggi</span>
+    </div>
+    <div class="hero-visual">
+      <svg width="104" height="104" viewBox="0 0 104 104">
+        <polygon points="52,8 92,36 76,84 28,84 12,36" fill="none" stroke="#E4DCC9" stroke-width="1.5"/>
+        <polygon points="52,26 74,42 65,70 39,70 30,42" fill="none" stroke="#E4DCC9" stroke-width="1.5"/>
+        <polygon points="52,44 68,50 60,74 44,72 38,46" fill="#455560" fill-opacity=".3" stroke="#455560" stroke-width="2"/>
+        <polygon points="52,14 84,38 72,80 32,78 20,40" fill="#FDBE57" fill-opacity=".28" stroke="#E8951F" stroke-width="2"/>
+      </svg>
+    </div>
+    <h1>Scopri dove sei.<br>E dove puoi arrivare.</h1>
+    <p class="lead">5 aree, un radar: il tuo prossimo passo, subito chiaro.</p>
+    <div class="chips">
+      <span class="chip">Come stai</span>
+      <span class="chip">Obiettivi</span>
+      <span class="chip">Stile di vita</span>
+      <span class="chip">Allenamento</span>
+      <span class="chip">Biohacking</span>
+    </div>
+    <div class="spacer"></div>
+    <svg class="peaks-cta" viewBox="0 0 300 14" preserveAspectRatio="none"><polyline points="0,14 30,2 60,14 90,4 120,14 150,0 180,14 210,4 240,14 270,2 300,14" fill="none" stroke="#FDBE57" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
+    <button class="btn btn-primary" onclick="goTo('quiz')">Inizia il test</button>
+    <div class="time-note">Circa 2 minuti · risultato immediato</div>
+  </div>
+
+  <!-- ============ QUIZ ============ -->
+  <div class="screen" id="screen-quiz">
+    <button class="back-link" onclick="prevQuestion()">← Indietro</button>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-meta"><span id="progressLabel">Domanda 1 di 20</span><span id="areaLabel"></span></div>
+    <div class="area-tag" id="areaTag"></div>
+    <p class="question-text" id="questionText"></p>
+    <div class="scale" id="scaleOptions"></div>
+    <div class="scale-labels"><span id="scaleLow"></span><span id="scaleHigh"></span></div>
+  </div>
+
+  <!-- ============ TARGET ============ -->
+  <div class="screen" id="screen-target">
+    <div class="eyebrow">ULTIMO PASSO</div>
+    <h2>Dove vuoi arrivare tra 6 mesi?</h2>
+    <p class="lead">Per ogni area, indica il livello che vorresti raggiungere.</p>
+    <div id="targetRows"></div>
+    <div class="spacer"></div>
+    <button class="btn btn-primary" onclick="computeResults()">Vedi il mio radar</button>
+  </div>
+
+  <!-- ============ RESULTS ============ -->
+  <div class="screen" id="screen-results">
+    <div class="eyebrow">IL TUO PROFILO</div>
+    <h2>Il tuo Performance Profile</h2>
+    <div class="radar-wrap" id="radarWrap"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#455560"></div>Oggi</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#FDBE57"></div>Obiettivo</div>
+    </div>
+    <div class="insight-card">
+      <div class="k">Il gap più ampio</div>
+      <p id="insightText"></p>
+    </div>
+    <div class="gap-list" id="gapList"></div>
+    <button class="btn btn-primary" onclick="goTo('lead')">Ricevi il report completo</button>
+  </div>
+
+  <!-- ============ LEAD FORM ============ -->
+  <div class="screen" id="screen-lead">
+    <div class="eyebrow">QUASI FATTO</div>
+    <h2>Dove ti mandiamo il report?</h2>
+    <p class="lead">Ricevi via email il tuo Performance Profile completo.</p>
+    <div class="field"><label>Nome e cognome</label><input type="text" id="fName" placeholder="Mario Rossi"></div>
+    <div class="field"><label>Email</label><input type="email" id="fEmail" placeholder="mario@email.com"></div>
+    <div class="field"><label>Telefono</label><input type="tel" id="fPhone" placeholder="333 1234567"></div>
+    <div class="error-msg" id="formError">Compila tutti i campi con dati validi.</div>
+    <div class="consent">
+      <input type="checkbox" id="fConsent">
+      <label for="fConsent">Acconsento al trattamento dei miei dati da parte di Alma Sport per ricevere il report e per essere ricontattato/a in merito ai servizi proposti.</label>
+    </div>
+    <button class="btn btn-primary" id="submitBtn" onclick="submitLead()">Invia e vedi la mia CTA</button>
+  </div>
+
+  <!-- ============ THANKS / CTA ============ -->
+  <div class="screen" id="screen-thanks">
+    <div class="check-mark">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="#FDBE57" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <h2>Report in arrivo, <span id="thanksName">.</span></h2>
+    <p class="lead">Il modo più veloce per colmare il tuo gap è parlarne con chi disegna il percorso: una consulenza gratuita con il nostro team.</p>
+    <div class="cta-stack">
+      <a class="btn btn-primary" id="ctaWhatsapp" href="#" target="_blank" style="text-decoration:none;">Prenota la consulenza gratuita</a>
+      <button class="btn btn-ghost" onclick="location.reload()">Torna alla home</button>
+    </div>
+    <div class="footer-note">Alma Sport — Via dei Palumbo 59, Lecce</div>
+  </div>
+
+</div>
+
+<script>
+/* =======================================================
+   CONFIG — modifica questi valori prima del deploy
+======================================================= */
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbybfKDxRC42JuSl-l8ljPs0Q4TptlIPF8nt3Hjhmudd2jnlaZIG8Hx4wHo8aRFKEz-M/exec";
+const BOOKING_LINK = "https://calendar.app.google/VQ4SKVhss7N7K9ku8";
+document.getElementById('ctaWhatsapp').href = BOOKING_LINK;
+
+/* =======================================================
+   DATA
+======================================================= */
+const AREAS = [
+  { key:"comeStai", label:"Come stai", low:"Per niente", high:"Moltissimo",
+    questions:[
+      "Quanto ti senti energico/a durante la giornata?",
+      "Come valuti la qualità del tuo sonno?",
+      "Quanto ti senti equilibrato/a mentalmente, anche nei momenti di stress?",
+      "Come valuti il tuo umore generale in questo periodo?"
+    ]},
+  { key:"obiettivi", label:"Obiettivi", low:"Per niente", high:"Moltissimo",
+    questions:[
+      "Quanto è chiaro per te l'obiettivo fisico che vuoi raggiungere?",
+      "Quanto sei soddisfatto/a dei progressi fatti finora?",
+      "Quanto ti senti motivato/a a lavorare per i tuoi obiettivi?",
+      "Quanto senti di avere un piano concreto per raggiungerli?"
+    ]},
+  { key:"stileVita", label:"Stile di vita", low:"Per niente", high:"Moltissimo",
+    questions:[
+      "Quanto è equilibrata la tua alimentazione in una settimana tipo?",
+      "Quanto movimento fai fuori dagli allenamenti (camminate, vita attiva)?",
+      "Quanto riesci a gestire bene lavoro, vita privata e cura di te?",
+      "Quanto sei soddisfatto/a delle tue abitudini quotidiane in generale?"
+    ]},
+  { key:"allenamento", label:"Allenamento", low:"Per niente", high:"Moltissimo",
+    questions:[
+      "Quanto sei stato/a costante negli allenamenti nell'ultimo mese?",
+      "Quanto senti che il tuo allenamento è davvero su misura per te?",
+      "Quanto sei soddisfatto/a dei risultati ottenuti finora?",
+      "Quanto ti diverti mentre ti alleni?"
+    ]},
+  { key:"biohacking", label:"Biohacking (Ottimizzazione stile di vita)", low:"Per niente", high:"Moltissimo",
+    questions:[
+      "Quanto conosci le tue abitudini di recupero (sonno, riposo, stress)?",
+      "Quanto tieni traccia di sonno, energia o performance, anche solo a sensazione?",
+      "Quanto sei aperto/a a provare strategie per ottimizzare le tue performance?",
+      "Quanto senti di sfruttare davvero il tuo potenziale in questo momento?"
+    ]}
+];
+const FLAT_QUESTIONS = AREAS.flatMap((a,ai)=>a.questions.map((q,qi)=>({areaIndex:ai, text:q})));
+
+let answers = new Array(FLAT_QUESTIONS.length).fill(null);
+let targets = new Array(AREAS.length).fill(3);
+let currentQ = 0;
+let scoresAttuale = [], scoresObiettivo = [];
+
+/* =======================================================
+   NAVIGATION
+======================================================= */
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='quiz'){ currentQ = answers.findIndex(a=>a===null); if(currentQ===-1) currentQ=0; renderQuestion(); }
+  if(id==='target'){ renderTargets(); }
+}
+
+/* =======================================================
+   QUIZ
+======================================================= */
+function renderQuestion(){
+  const total = FLAT_QUESTIONS.length;
+  const q = FLAT_QUESTIONS[currentQ];
+  const area = AREAS[q.areaIndex];
+  document.getElementById('progressFill').style.width = (currentQ/total*100)+'%';
+  document.getElementById('progressLabel').textContent = `Domanda ${currentQ+1} di ${total}`;
+  document.getElementById('areaTag').textContent = area.label;
+  document.getElementById('questionText').textContent = q.text;
+  document.getElementById('scaleLow').textContent = area.low;
+  document.getElementById('scaleHigh').textContent = area.high;
+  const wrap = document.getElementById('scaleOptions');
+  wrap.innerHTML = '';
+  for(let v=1; v<=5; v++){
+    const btn = document.createElement('div');
+    btn.className = 'opt'+(answers[currentQ]===v?' selected':'');
+    btn.textContent = v;
+    btn.onclick = ()=>selectAnswer(v);
+    wrap.appendChild(btn);
+  }
+}
+function selectAnswer(v){
+  answers[currentQ] = v;
+  renderQuestion();
+  setTimeout(()=>{
+    if(currentQ < FLAT_QUESTIONS.length - 1){ currentQ++; renderQuestion(); }
+    else { goTo('target'); }
+  }, 220);
+}
+function prevQuestion(){
+  if(currentQ > 0){ currentQ--; renderQuestion(); }
+  else { goTo('landing'); }
+}
+
+/* =======================================================
+   TARGET SLIDERS
+======================================================= */
+function renderTargets(){
+  const wrap = document.getElementById('targetRows');
+  wrap.innerHTML = '';
+  AREAS.forEach((area, i)=>{
+    const row = document.createElement('div');
+    row.className = 'target-row';
+    row.innerHTML = `
+      <div class="row-head"><b>${area.label}</b><span id="targetVal${i}">${targets[i]} / 5</span></div>
+      <input type="range" min="1" max="5" step="1" value="${targets[i]}" oninput="updateTarget(${i}, this.value)">
+    `;
+    wrap.appendChild(row);
+  });
+}
+function updateTarget(i, v){
+  targets[i] = parseInt(v);
+  document.getElementById('targetVal'+i).textContent = v + ' / 5';
+}
+
+/* =======================================================
+   SCORING + RADAR
+======================================================= */
+function computeResults(){
+  scoresAttuale = AREAS.map((area, ai)=>{
+    const qs = FLAT_QUESTIONS.map((q,idx)=>({q,idx})).filter(x=>x.q.areaIndex===ai);
+    const sum = qs.reduce((s,x)=>s + (answers[x.idx]||1), 0); // 4..20
+    return Math.round((sum-4)/16*100);
+  });
+  scoresObiettivo = targets.map(t=> Math.round((t-1)/4*100) );
+
+  drawRadar();
+  renderInsight();
+  goTo('results');
+}
+
+function drawRadar(){
+  const size = 300, cx = size/2, cy = size/2, R = 108;
+  const n = AREAS.length;
+  const angle = (i)=> -Math.PI/2 + i*(2*Math.PI/n);
+  const pt = (i, val)=>{
+    const r = R*(val/100);
+    return [cx + r*Math.cos(angle(i)), cy + r*Math.sin(angle(i))];
+  };
+  const ptAt = (i, r)=> [cx + r*Math.cos(angle(i)), cy + r*Math.sin(angle(i))];
+
+  let grid = '';
+  [20,40,60,80,100].forEach(level=>{
+    const r = R*(level/100);
+    let poly = '';
+    for(let i=0;i<n;i++){ const [x,y]=ptAt(i,r); poly += `${x},${y} `; }
+    grid += `<polygon points="${poly}" fill="none" stroke="#E4DCC9" stroke-width="1"/>`;
+  });
+  let axes = '', labels = '';
+  for(let i=0;i<n;i++){
+    const [x,y] = ptAt(i,R);
+    axes += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#E4DCC9" stroke-width="1"/>`;
+    const [lx,ly] = ptAt(i,R+26);
+    const shortLabel = AREAS[i].label.split(' (')[0];
+    labels += `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="11.5" font-weight="700" fill="#455560" font-family="Barlow, sans-serif">${shortLabel}</text>`;
+  }
+  const polyPoints = (scores)=> scores.map((s,i)=>pt(i,s).join(',')).join(' ');
+
+  const svg = `
+  <svg width="${size}" height="${size+30}" viewBox="0 -14 ${size} ${size+30}">
+    ${grid}${axes}
+    <polygon points="${polyPoints(scoresAttuale)}" fill="#455560" fill-opacity="0.28" stroke="#455560" stroke-width="2.5"/>
+    <polygon points="${polyPoints(scoresObiettivo)}" fill="#FDBE57" fill-opacity="0.28" stroke="#E8951F" stroke-width="2.5"/>
+    ${labels}
+  </svg>`;
+  document.getElementById('radarWrap').innerHTML = svg;
+}
+
+function renderInsight(){
+  const gaps = AREAS.map((a,i)=>({ label:a.label, gap: scoresObiettivo[i]-scoresAttuale[i] }));
+  const maxGap = gaps.reduce((m,g)=> g.gap>m.gap?g:m, gaps[0]);
+  if(maxGap.gap <= 5){
+    document.getElementById('insightText').textContent = "Il tuo profilo è già ben allineato tra dove sei e dove vuoi arrivare: la sfida ora è mantenere la costanza.";
+  } else {
+    document.getElementById('insightText').textContent = `${maxGap.label} (+${maxGap.gap} punti): è l'area dove una consulenza mirata può fare la differenza più grande.`;
+  }
+  const list = document.getElementById('gapList');
+  list.innerHTML = '';
+  gaps.sort((a,b)=>b.gap-a.gap).forEach(g=>{
+    const pct = Math.max(0, Math.min(100, g.gap));
+    const item = document.createElement('div');
+    item.className = 'gap-item';
+    item.innerHTML = `<span style="width:92px">${g.label.split(' (')[0]}</span><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div><span class="val">+${Math.max(0,g.gap)}</span>`;
+    list.appendChild(item);
+  });
+}
+
+/* =======================================================
+   LEAD SUBMIT
+======================================================= */
+function submitLead(){
+  const name = document.getElementById('fName').value.trim();
+  const email = document.getElementById('fEmail').value.trim();
+  const phone = document.getElementById('fPhone').value.trim();
+  const consent = document.getElementById('fConsent').checked;
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  if(!name || !emailOk || !phone || !consent){
+    document.getElementById('formError').style.display = 'block';
+    return;
+  }
+  document.getElementById('formError').style.display = 'none';
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Invio in corso…';
+
+  const payload = {
+    timestamp: new Date().toISOString(),
+    name, email, phone,
+    comeStai: scoresAttuale[0], obiettivi: scoresAttuale[1], stileVita: scoresAttuale[2], allenamento: scoresAttuale[3], biohacking: scoresAttuale[4],
+    targetComeStai: scoresObiettivo[0], targetObiettivi: scoresObiettivo[1], targetStileVita: scoresObiettivo[2], targetAllenamento: scoresObiettivo[3], targetBiohacking: scoresObiettivo[4]
+  };
+
+  fetch(GOOGLE_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  }).catch(()=>{ /* no-cors: non leggiamo la risposta, procediamo comunque */ })
+  .finally(()=>{
+    document.getElementById('thanksName').textContent = name.split(' ')[0] || '';
+    goTo('thanks');
+    btn.disabled = false;
+    btn.textContent = 'Invia e vedi la mia CTA';
+  });
+}
+</script>
+</body>
+</html>
