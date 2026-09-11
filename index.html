@@ -204,13 +204,29 @@
     </div>
     <div class="spacer"></div>
     <svg class="peaks-cta" viewBox="0 0 300 14" preserveAspectRatio="none"><polyline points="0,14 30,2 60,14 90,4 120,14 150,0 180,14 210,4 240,14 270,2 300,14" fill="none" stroke="#FDBE57" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
-    <button class="btn btn-primary" onclick="goTo('mood')">Inizia il test</button>
+    <button class="btn btn-primary" onclick="goTo('gate')">Inizia il test</button>
     <div class="time-note">Circa 2 minuti · risultato immediato</div>
+  </div>
+
+  <!-- ============ EMAIL GATE ============ -->
+  <div class="screen" id="screen-gate">
+    <button class="back-link" onclick="goTo('landing')">← Indietro</button>
+    <div class="eyebrow">PRIMA DI PARTIRE</div>
+    <h2>Dove ti mandiamo i risultati?</h2>
+    <p class="lead">Ci serve solo l'email per iniziare — nome e telefono te li chiediamo alla fine.</p>
+    <div class="field"><label>Email</label><input type="email" id="gateEmail" placeholder="mario@email.com" autocomplete="email" inputmode="email"></div>
+    <div class="error-msg" id="gateError">Inserisci un'email valida e conferma il consenso.</div>
+    <div class="consent">
+      <input type="checkbox" id="gateConsent">
+      <label for="gateConsent">Acconsento al trattamento dei miei dati (email, e se li fornirò anche nome e telefono) da parte di Alma Sport per ricevere i risultati del test e per essere ricontattato/a in merito ai servizi proposti.</label>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn btn-primary" id="gateBtn" onclick="submitGate()">Inizia il test</button>
   </div>
 
   <!-- ============ MOOD (0-10) ============ -->
   <div class="screen" id="screen-mood">
-    <button class="back-link" onclick="goTo('landing')">← Indietro</button>
+    <button class="back-link" onclick="goTo('gate')">← Indietro</button>
     <div class="eyebrow">PRIMA DI INIZIARE</div>
     <h2>Come stai, in questo momento?</h2>
     <p class="lead">0 = a pezzi, 10 = al top della forma.</p>
@@ -265,16 +281,11 @@
   <!-- ============ LEAD FORM ============ -->
   <div class="screen" id="screen-lead">
     <div class="eyebrow">QUASI FATTO</div>
-    <h2>Dove ti mandiamo il report?</h2>
-    <p class="lead">Ricevi via email il tuo Performance Profile completo.</p>
+    <h2>Un'ultima cosa</h2>
+    <p class="lead">Così il consulente sa chi contattare per la consulenza.</p>
     <div class="field"><label>Nome e cognome</label><input type="text" id="fName" placeholder="Mario Rossi" autocomplete="name"></div>
-    <div class="field"><label>Email</label><input type="email" id="fEmail" placeholder="mario@email.com" autocomplete="email" inputmode="email"></div>
     <div class="field"><label>Telefono</label><input type="tel" id="fPhone" placeholder="333 1234567" autocomplete="tel" inputmode="tel"></div>
-    <div class="error-msg" id="formError">Compila tutti i campi con dati validi.</div>
-    <div class="consent">
-      <input type="checkbox" id="fConsent">
-      <label for="fConsent">Acconsento al trattamento dei miei dati da parte di Alma Sport per ricevere il report e per essere ricontattato/a in merito ai servizi proposti.</label>
-    </div>
+    <div class="error-msg" id="formError">Compila entrambi i campi.</div>
     <button class="btn btn-primary" id="submitBtn" onclick="submitLead()">Invia e vedi la mia CTA</button>
   </div>
 
@@ -348,6 +359,7 @@ let answers = new Array(FLAT_QUESTIONS.length).fill(null);
 let targets = new Array(AREAS.length).fill(3);
 let targetsInitialized = false;
 let moodNow = 5;
+let leadEmail = '';
 let currentQ = 0;
 let scoresAttuale = [], scoresObiettivo = [];
 
@@ -411,6 +423,32 @@ function prevQuestion(){
   if(currentQ > 0){ currentQ--; renderQuestion(); }
   else { goTo('mood'); }
 }
+function submitGate(){
+  const email = document.getElementById('gateEmail').value.trim();
+  const consent = document.getElementById('gateConsent').checked;
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  if(!emailOk || !consent){
+    document.getElementById('gateError').style.display = 'block';
+    return;
+  }
+  document.getElementById('gateError').style.display = 'none';
+  leadEmail = email;
+
+  const btn = document.getElementById('gateBtn');
+  btn.disabled = true;
+
+  fetch(GOOGLE_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ status: 'iniziato', timestamp: new Date().toISOString(), email: leadEmail })
+  }).catch(()=>{}).finally(()=>{
+    goTo('mood');
+    btn.disabled = false;
+  });
+}
+
 function updateMood(v){
   moodNow = parseInt(v);
   document.getElementById('moodVal').textContent = v + ' / 10';
@@ -533,12 +571,9 @@ function renderInsight(){
 ======================================================= */
 function submitLead(){
   const name = document.getElementById('fName').value.trim();
-  const email = document.getElementById('fEmail').value.trim();
   const phone = document.getElementById('fPhone').value.trim();
-  const consent = document.getElementById('fConsent').checked;
-  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  if(!name || !emailOk || !phone || !consent){
+  if(!name || !phone){
     document.getElementById('formError').style.display = 'block';
     return;
   }
@@ -549,8 +584,9 @@ function submitLead(){
   btn.textContent = 'Invio in corso…';
 
   const payload = {
+    status: 'completato',
     timestamp: new Date().toISOString(),
-    name, email, phone,
+    name, email: leadEmail, phone,
     moodNow,
     comeStai: scoresAttuale[0], obiettivi: scoresAttuale[1], stileVita: scoresAttuale[2], allenamento: scoresAttuale[3], biohacking: scoresAttuale[4],
     targetComeStai: scoresObiettivo[0], targetObiettivi: scoresObiettivo[1], targetStileVita: scoresObiettivo[2], targetAllenamento: scoresObiettivo[3], targetBiohacking: scoresObiettivo[4]
